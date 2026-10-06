@@ -1,0 +1,6 @@
+org\team1317\mathLib\Main.class
+org\team1317\mathLib\PID.class
+org\team1317\mathLib\FeedForward.class
+org\team1317\mathLib\Profiler.class
+org\team1317\mathLib\TrapezoidProfiler.class
+org\team1317\mathLib\FeedForwardArm.class
