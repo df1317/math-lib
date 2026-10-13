@@ -20,16 +20,34 @@ public class TrapezoidProfiler implements Profiler {
 
     @Override
     public double calculate(double currentPosition, double currentVelocity, double deltaSeconds) {
-        double stoppingDistance = 
-            ((Math.pow(currentVelocity, 2) - Math.pow(goalVelocity, 2)) / (2 * maxAcceleration));
-        boolean startDeceleration = stoppingDistance >= Math.abs(goalPosition - currentPosition);
-        System.out.println("stopping distance: "+stoppingDistance+" distance from goal: "+Math.abs(goalPosition - currentPosition));
-        if(startDeceleration) {
-            return  currentVelocity - (maxAcceleration * deltaSeconds);
+        double posIfDecel = whereWouldIBeIfIStartDeceleratingNow(currentPosition, currentVelocity, deltaSeconds);
+        System.out.println("posIfDecel: " + posIfDecel + " currentVelocity: " + currentVelocity); 
+       if( posIfDecel >= goalPosition) {
+            // we need to decelerate
+            return currentVelocity - maxAcceleration * deltaSeconds;
+        } else {
+            // we can accelerate
+            double nextVelocity = currentVelocity + maxAcceleration * deltaSeconds;
+            nextVelocity = Math.clamp(nextVelocity, -maxVelocity, maxVelocity);
+            return nextVelocity;
         }
-        double nextVelocity = currentVelocity + (maxAcceleration * deltaSeconds);
-        nextVelocity = Math.clamp(nextVelocity, -maxVelocity, maxVelocity);
-
-        return nextVelocity;
     }
+    private double whereWouldIBeIfIStartDeceleratingNow(double currentPosition, double currentVelocity, double deltaSeconds) {
+        while(currentVelocity > 0) {
+            currentPosition += currentVelocity * deltaSeconds;
+            currentVelocity -= maxAcceleration * deltaSeconds;
+        }
+        return currentPosition;
+    }
+
+    // maybe useful:
+    //  double accelerationTime = maxVelocity / maxAcceleration;
+    //     double accelerationDistance = 0.5 * maxAcceleration * Math.pow(accelerationTime, 2);
+
+    //     double totalDistance = Math.abs(goalPosition - currentPosition);
+    //     double cruiseDistance = totalDistance - 2 * accelerationDistance;
+
+    //     double cruiseTime = cruiseDistance / maxVelocity;
+    //     double totalTime = accelerationTime * 2+ cruiseTime;
+
 }

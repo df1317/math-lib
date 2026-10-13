@@ -14,18 +14,34 @@ public class Main {
         double currentPosition = 0.0;
         double currentVelocity = 0.0;
 
-        profile.setGoal(10.0, 0.0); // Example goal position and velocity
+        double goalPosition = 10.0;
 
+        profile.setGoal(goalPosition, 0.0); // Example goal position and velocity
+        double step = goalPosition / ((double)(numPoints));
         for(int i = 0; i < numPoints; i++) {
-            double step = 0.02;
-            double x = (i/20.0);
+           
+            double x = i  * step;
             currentVelocity = profile.calculate(currentPosition, currentVelocity, step);
             currentPosition += currentVelocity * step;
             xData[i] = x;
             yData[i] = currentVelocity;
+
+            if(currentPosition >= goalPosition) {
+                System.out.println("Reached goal position at x = " + x);
+                break;
+            }
         }
 
         XYChart chart = QuickChart.getChart("profile", "X", "Y", "f(x)", xData, yData);
         new SwingWrapper(chart).displayChart();
-    }   
+
+        double xDataDerivitive[] = new double[numPoints];
+        double yDataDerivitive[] = new double[numPoints];
+        for(int i = 0; i < numPoints; i++) {
+            xDataDerivitive[i] = xData[i];
+            yDataDerivitive[i] = (yData[i] - (i > 0 ? yData[i-1] : 0)) / step;
+        }
+        XYChart chart2 = QuickChart.getChart("derivative", "X", "Y", "f'(x)", xDataDerivitive, yDataDerivitive);
+        new SwingWrapper(chart2).displayChart();
+    }
 }
